@@ -1,0 +1,79 @@
+"""
+This program creates different filters and image effects.
+The user can load their own image from file, or use the default one to to show examples of the filters/effects.
+SimpleImage from Pillow was downloaded through the terminal: py -m pip install Pillow
+"""
+
+from simpleimage import SimpleImage
+
+DEFAULT_FILE = /Mona-Lisa.jpg'
+
+def main():
+    # Get file and load image
+    filename = get_file()
+    image = SimpleImage(filename)
+
+    # Show the image before the manipulation
+    image.show()
+    #run the different functions for the effects and show the results each time
+    red(image)
+    image.show()
+
+    gray = grayscale(filename)
+    gray.show()
+
+    mirrored = mirror_image(filename)
+    mirrored.show()
+    
+def red(image):
+    """
+    changes the green and blue channels to leave the red channel, thereby enhancing the red in the picture
+    """
+    for pixel in image:
+        pixel.green = 0
+        pixel.blue = 0
+    return image
+
+def grayscale(filename):
+    """
+    using the official grayscale calculation (sown in function grayscale_calc), the channels are changed to gray each pixel
+    """
+    image = SimpleImage(filename)
+    for pixel in image:
+        gray = grayscale_calc(pixel.red, pixel.green, pixel.blue)
+        pixel.red = gray
+        pixel.green = gray
+        pixel.blue = gray
+    return image
+
+def grayscale_calc(red, green, blue):
+    return (0.299 * red) + (0.587 * green) + (0.114 * blue)
+
+def mirror_image(filename):
+    """
+    This function gets the width and height of the original picture, then to mirror the imnage it creates a blank image of twice the width
+    Each pixel in the original image is copied into the blank image in both 0, 0 AND -1, 0 of blank image, thus creating the new mirror image
+    """
+    image = SimpleImage(filename)
+    width = image.width
+    height = image.height
+    #create new blank image
+    mirror = SimpleImage.blank(width * 2, height)
+
+    for y in range(height):
+        for x in range(width):
+            pixel = image.get_pixel(x,y)
+            mirror.set_pixel(x, y, pixel)
+            mirror.set_pixel((width * 2) - (x + 1), y, pixel)
+    return mirror
+        
+def get_file():
+    # Read image file path from user, or use the default file
+    filename = input('Enter image file (or press enter for default): ')
+    if filename == '':
+        filename = DEFAULT_FILE
+    return filename
+
+
+if __name__ == '__main__':
+    main()
